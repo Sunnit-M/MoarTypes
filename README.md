@@ -1,24 +1,18 @@
+# MoarTypes (MicroBit Extension)
+## JSON utility
+-----------------------------------
+- Adds JSON stringify to turn objects into strings
+- Turn JSON strings back into objects
 
-> Open this page at [https://sunnit-m.github.io/moartypes/](https://sunnit-m.github.io/moartypes/)
 
-## Use as Extension
+# New Types
+--------------------------------------
+- Dictionary
+- Vector2
 
-This repository can be added as an **extension** in MakeCode.
+# Misc
+----------------------------------
+- Check type of a objects
+- Mark a string to identify later and also remove the marker
+- Throw errors
 
-* open [https://makecode.microbit.org/](https://makecode.microbit.org/)
-* click on **New Project**
-* click on **Extensions** under the gearwheel menu
-* search for **https://github.com/sunnit-m/moartypes** and import
-
-## Edit this project
-
-To edit this repository in MakeCode.
-
-* open [https://makecode.microbit.org/](https://makecode.microbit.org/)
-* click on **Import** then click on **Import URL**
-* paste **https://github.com/sunnit-m/moartypes** and click import
-
-#### Metadata (used for search, rendering)
-
-* for PXT/microbit
-<script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
