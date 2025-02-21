@@ -1,17 +1,17 @@
-interface Vector2{
+interface Moar_Vector2{
     X : number;
     Y : number;
 }
 
-interface Dictionary{
+interface Moar_Dictionary{
     keys : string[];
     values : any[];
 }
 enum TYPES{
     _string,
     _number,
-    _Dictionary,
-    _Vector2,
+    _Moar_Dictionary,
+    _Moar_Vector2,
 }
 
 enum Markers{
@@ -23,12 +23,12 @@ enum Markers{
     Packet
 }
 
-function isDictionary(obj: any): obj is Dictionary {
-    return (obj && typeof obj === 'object' && typeof (obj as Dictionary).keys == "object");
+function isDictionary(obj: any): obj is Moar_Dictionary {
+    return (obj && typeof obj === 'object' && typeof (obj as Moar_Dictionary).keys == "object");
 }
 
-function isVector2(obj: any): obj is Vector2 {
-    return (obj && typeof obj === 'object' && typeof (obj as Vector2).X === 'number' && typeof (obj as Vector2).Y === 'number');
+function isVector2(obj: any): obj is Moar_Vector2 {
+    return (obj && typeof obj === 'object' && typeof (obj as Moar_Vector2).X === 'number' && typeof (obj as Moar_Vector2).Y === 'number');
 }
 
 /**
@@ -42,7 +42,7 @@ namespace MoarTypes {
     //% block  
     //% group="Vector2"
 
-    export function NewVector2(x: number, y : number): Vector2 {
+    export function NewVector2(x: number, y : number): Moar_Vector2 {
         let obj = {X: x, Y : y}
         return obj
     }
@@ -52,7 +52,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Vector2"
-    export function XOf(vector : Vector2): number {
+    export function XOf(vector : Moar_Vector2): number {
         return vector.X
     }
 
@@ -61,7 +61,7 @@ namespace MoarTypes {
     */
     //% block
     //% group="Vector2"
-    export function YOf(vector: Vector2): number {
+    export function YOf(vector: Moar_Vector2): number {
         return vector.Y
     }
 
@@ -70,7 +70,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
-    export function CreateDictionary(initialKey : string, initialValue : any): Dictionary{
+    export function CreateDictionary(initialKey : string, initialValue : any): Moar_Dictionary{
         const _keys : string[] = [initialKey]
         const _values : any[] = [initialValue]
 
@@ -83,7 +83,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
-    export function AppendDictionary(dictionary: Dictionary, key: string, value: any): void{
+    export function AppendDictionary(dictionary: Moar_Dictionary, key: string, value: any): void{
         dictionary.keys.insertAt(0, key)
         dictionary.values.insertAt(0, value)
     }
@@ -93,7 +93,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
-    export function GetValue(dictionary : Dictionary, key : string) : any{
+    export function GetValue(dictionary : Moar_Dictionary, key : string) : any{
         let i = 0
         for (let x of dictionary.keys) {
             if(x == key){
@@ -108,7 +108,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
-    export function RemoveElement(dictionary : Dictionary, key : string) : void{
+    export function RemoveElement(dictionary : Moar_Dictionary, key : string) : void{
         let i = 0
         for (let x of dictionary.keys) {
             if (x == key) {
@@ -119,6 +119,28 @@ namespace MoarTypes {
             i++
         }
     }
+    /**
+     * Converts a dictionary to a dictionary used by most other text based coding launguages and then converts it to json
+    */
+    //% block
+    //% group="Dictionary"
+    export function ConvertDictionary(dictionary : Moar_Dictionary) : string{
+        if(dictionary.keys[0] == null){
+            throw "ERROR Dictionary cannot be null"
+        }
+        const firstKey : string = dictionary.keys[0]
+        const firstValue = dictionary.values[0]
+        let foo: any = {key : firstValue}
+
+        for(let i = 0; i >= dictionary.keys.length; i++){
+            const xKey : string = dictionary.keys[i]
+            const xValue = dictionary.values[i]
+            foo[xKey] = xValue
+        }
+
+        return JSON.stringify(foo)
+    }
+
     /**
      * Returns true if it is the specified type
      */
@@ -143,7 +165,7 @@ namespace MoarTypes {
                 return false
             }
         }
-        if(typeEnum == TYPES._Vector2){
+        if(typeEnum == TYPES._Moar_Vector2){
             if(isVector2(value)){
                 return true
             }
@@ -152,7 +174,7 @@ namespace MoarTypes {
                 return false
             }
         }
-        if(typeEnum == TYPES._Dictionary){
+        if(typeEnum == TYPES._Moar_Dictionary){
             if (isDictionary(value)){
                 return true
             }
