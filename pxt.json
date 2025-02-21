@@ -1,6 +1,6 @@
 {
     "name": "MoarTypes",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "A extension to add more types and json support",
     "dependencies": {
         "core": "*"
