@@ -1,49 +1,67 @@
-interface Moar_Vector2{
-    X : number;
-    Y : number;
-}
-
-interface Moar_Dictionary{
-    keys : string[];
-    values : any[];
-}
-enum TYPES{
-    _string,
-    _number,
-    _Moar_Dictionary,
-    _Moar_Vector2,
-}
-
-enum Markers{
-    Data,
-    Json,
-    MOAR,
-    Unknown,
-    User,
-    Packet
-}
-
-function isDictionary(obj: any): obj is Moar_Dictionary {
-    return (obj && typeof obj === 'object' && typeof (obj as Moar_Dictionary).keys == "object");
-}
-
-function isVector2(obj: any): obj is Moar_Vector2 {
-    return (obj && typeof obj === 'object' && typeof (obj as Moar_Vector2).X === 'number' && typeof (obj as Moar_Vector2).Y === 'number');
-}
-
-/**
- * Allows for some more types to be used
- */
-//% weight=100 color=#751AE4 icon="" groups='["Dictionary","Vector2","Logic","JSON","Marking","Misc","Images"]'
+//% weight=100 color=#751AE4 icon="\uf121" groups='["Dictionary","Vector2","Logic","JSON","Marking","Misc","Images","Depracated","Images"]'
 namespace MoarTypes {
+    export const marks = ["-DA+TA-", "-JS+ON-", "-MO+AR-", "Unknown", "-US+ER-","Pac-ket"]
+
+    class Moar_Vector2 {
+        public x :number;
+        public y :number;
+
+        constructor(X:number,Y:number){
+            this.x = X
+            this.y = Y
+        }
+
+        magitude() : number{
+            return Math.sqrt((this.x * this.x) + (this.y * this.y))
+        }
+
+        private toJSON() {
+            return {
+                x : this.x,
+                y : this.y,
+                type :"Moar_Vector2"
+            }
+        }
+    }
+
+    export interface Moar_Dictionary {
+        keys: string[];
+        values: any[];
+    }
+
+    export enum TYPES {
+        _string,
+        _number,
+        _Moar_Dictionary,
+        _Moar_Vector2,
+    }
+
+    export enum Markers {
+        Data,
+        Json,
+        MOAR,
+        Unknown,
+        User,
+        Packet
+    }
+
+    export function isDictionary(obj: any): obj is Moar_Dictionary {
+        return (obj && typeof obj === 'object' && typeof (obj as Moar_Dictionary).keys == "object");
+    }
+
+    export function isVector2(obj: any): obj is Moar_Vector2 {
+        return (obj instanceof Moar_Vector2);
+    }
+    
     /**
      * MoarTypes : Makes A New Vector2
      */
     //% block  
     //% group="Vector2"
+    //% weight=100
 
     export function NewVector2(x: number, y : number): Moar_Vector2 {
-        let obj = {X: x, Y : y}
+        let obj = new Moar_Vector2(x,y)
         return obj
     }
 
@@ -52,8 +70,9 @@ namespace MoarTypes {
      */
     //% block
     //% group="Vector2"
+    //% weight=99
     export function XOf(vector : Moar_Vector2): number {
-        return vector.X
+        return vector.x
     }
 
     /**
@@ -61,8 +80,9 @@ namespace MoarTypes {
     */
     //% block
     //% group="Vector2"
+    //% weight=98
     export function YOf(vector: Moar_Vector2): number {
-        return vector.Y
+        return vector.y
     }
 
     /**
@@ -70,6 +90,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
+    //% weight=100
     export function CreateDictionary(initialKey : string, initialValue : any): Moar_Dictionary{
         const _keys : string[] = [initialKey]
         const _values : any[] = [initialValue]
@@ -83,6 +104,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
+    //% weight=99
     export function AppendDictionary(dictionary: Moar_Dictionary, key: string, value: any): void{
         dictionary.keys.insertAt(0, key)
         dictionary.values.insertAt(0, value)
@@ -93,6 +115,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
+    //% weight=98
     export function GetValue(dictionary : Moar_Dictionary, key : string) : any{
         let i = 0
         for (let x of dictionary.keys) {
@@ -108,6 +131,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Dictionary"
+    //% weight=97
     export function RemoveElement(dictionary : Moar_Dictionary, key : string) : void{
         let i = 0
         for (let x of dictionary.keys) {
@@ -120,12 +144,13 @@ namespace MoarTypes {
         }
     }
     /**
-     * Converts a dictionary to a dictionary used by most other text based coding launguages and then converts it to json
+     * !Depracated! Converts a dictionary to a dictionary used by most other text based coding launguages and then converts it to json
     */
     //% block
-    //% group="Dictionary"
+    //% group="Dictionary" 
+    //% advanced=true
     export function ConvertDictionary(dictionary : Moar_Dictionary) : string{
-        if(dictionary.keys[0] == null){
+        if(dictionary.keys[0] == null || dictionary.values[0]){
             throw "ERROR Dictionary cannot be null"
         }
         const firstKey : string = dictionary.keys[0]
@@ -138,6 +163,8 @@ namespace MoarTypes {
             foo[xKey] = xValue
         }
 
+        serial.writeLine("[MoarTypes] - WARNING Convert Dictionary is Depracated and Will NOT be updated in the future")
+
         return JSON.stringify(foo)
     }
 
@@ -146,6 +173,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="Logic"
+    //% weight=100
     export function IsType(typeEnum : TYPES , value : any) : boolean{
         if(typeEnum == TYPES._string){
             if(typeof value == "string"){
@@ -191,7 +219,11 @@ namespace MoarTypes {
      */
     //% block
     //% group="JSON"
+    //% weight=100
     export function JsonStringify(value : any) : string{
+        if(isVector2(value) == true){
+            return(JSON.stringify(value.toJSON()))
+        }
         return JSON.stringify(value)
     }
 
@@ -200,6 +232,7 @@ namespace MoarTypes {
      */
     //% block
     //% group="JSON"
+    //% weight=99
     export function JsonParse(value : string) : any{
         if (IsMarked(value, Markers.Data)) {
             throw "[MoarTypes] ERROR - DATA IS MARKED"
@@ -227,6 +260,8 @@ namespace MoarTypes {
      */
     //% block
     //% group="Marking"
+    //% advanced=true
+    //% weight=100
     export function Mark(markType : Markers,value : string) : string{
         if(markType == Markers.Data){
             return "-DA+TA-" + value
@@ -253,6 +288,8 @@ namespace MoarTypes {
      */
     //% block
     //% group="Marking"
+    //% advanced=true
+    //% weight=98
     export function IsMarked(value : string, markType : Markers) : boolean{
         if(value.length > 6){
             const sliced = value.slice(0,7)
@@ -284,6 +321,8 @@ namespace MoarTypes {
      */
     //% block
     //% group="Marking"
+    //% advanced=true
+    //% weight=97
     export function RemoveMark(value : string) : string{
         if(IsMarked(value, Markers.Data)){
             return value.replace("-DA+TA-", "")
@@ -312,7 +351,90 @@ namespace MoarTypes {
      */
     //% block
     //% group="Misc"
+    //% advanced=true
+    //% weight=100
     export function ThrowError(ERROR : string) : void{
         throw ERROR
     }
+
+    /**
+     * Gets the micro-bit's serial number
+     */
+    //% block
+    //% group="Misc"
+    //% advanced=true
+    //% weight=98
+    export function GetSerial() : string{
+        return control.deviceSerialNumber().toString()
+    }
+
+    /**
+     * Converts a Miro-Bit image class into a number[][] with the brigntness values
+     */
+    //% block="ImageToArray"
+    //% group="Images"
+    //% weight=100
+
+    export function ImageToArray(input:Image) : number[][]{
+        if(input == null){
+            throw "Input cannot be null"
+        }
+        let array:number[][]  = 
+        [[0,0,0,0,]
+        ,[0,0,0,0,0]
+        ,[0,0,0,0,0]
+        ,[0,0,0,0,0]
+        ,[0,0,0,0,0]]
+        for (let x:number = 0; x < 5; x++) {
+            for (let y:number = 0; y < 5; y++){
+                array[x][y] = input.pixelBrightness(x,y)
+            }
+        }
+
+        return array
+    }
+
+    /**
+     * Uses the built in screenshot function
+     */
+    //% block="Screenshot"
+    //% group="Images"
+    //% weight=98
+    export function screenshot() : Image{
+        return led.screenshot()
+    }
+
+    /**
+     * Converts a number array with brightness values to a MicroBit Image
+     */
+    //% block="ArrayToImage"
+    //% group="Images"
+    //% weight=99
+    export function ArrayToImage(input: number[][]) : Image{
+        let image = images.createImage(`
+    . . . . .
+    . . . . .
+    . . . . .
+    . . . . .
+    . . . . .
+    `)
+        for (let x: number = 0; x < 5; x++) {
+            for (let y: number = 0; y < 5; y++) {
+                image.setPixelBrightness(x,y,input[x][y])
+            }
+        }
+        return image
+    }
+
+    /**
+     * Returns a null value
+     */
+    //% group=Misc
+    //% weight=100
+    //% advanced=true
+    //% block="null"
+    export function Null() : any{
+        return null
+    }
+
 }
