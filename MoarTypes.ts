@@ -1,33 +1,26 @@
 //% weight=100 color=#751AE4 icon="\uf121" groups='["Dictionary","Vector2","Logic","JSON","Marking","Misc","Images","Depracated","Images"]'
 namespace MoarTypes {
+    interface Json_vector{
+        x:number,
+        y:number,
+        type:string
+    }
+
+    interface Json_Dicionary{
+        data:any
+        type:string
+    }
+
     export const marks = ["-DA+TA-", "-JS+ON-", "-MO+AR-", "Unknown", "-US+ER-","Pac-ket"]
 
-    class Moar_Vector2 {
-        public x :number;
-        public y :number;
-
-        constructor(X:number,Y:number){
-            this.x = X
-            this.y = Y
-        }
-
-        magitude() : number{
-            return Math.sqrt((this.x * this.x) + (this.y * this.y))
-        }
-
-        private toJSON() {
-            return {
-                x : this.x,
-                y : this.y,
-                type :"Moar_Vector2"
-            }
-        }
+    export function isDictionary(obj: any): boolean {
+        return (obj instanceof Moar_Dictionary);
     }
 
-    export interface Moar_Dictionary {
-        keys: string[];
-        values: any[];
+    export function isVector2(obj: any): boolean {
+        return (obj instanceof Moar_Vector2);
     }
+    
 
     export enum TYPES {
         _string,
@@ -45,12 +38,109 @@ namespace MoarTypes {
         Packet
     }
 
-    export function isDictionary(obj: any): obj is Moar_Dictionary {
-        return (obj && typeof obj === 'object' && typeof (obj as Moar_Dictionary).keys == "object");
+    export class Moar_Vector2 {
+        public x :number;
+        public y :number;
+
+        constructor(X:number = 0,Y:number = 0){
+            this.x = X
+            this.y = Y
+        }
+
+        magitude() : number{
+            return Math.sqrt((this.x * this.x) + (this.y * this.y))
+        }
+
+        toJSON() {
+            let json = {
+                x : this.x,
+                y : this.y,
+                type :"Moar_Vector2"
+            }
+
+            return JSON.stringify(json)
+        }
+
+        fromJson(json :string) {
+            let obj = JSON.parse(json)
+
+            if(obj.type != "Moar_Vector2") {throw "Cannot Convert non Vetcor"}
+
+            this.x = obj.x
+            this.y = obj.y
+        }
     }
 
-    export function isVector2(obj: any): obj is Moar_Vector2 {
-        return (obj instanceof Moar_Vector2);
+    export class Moar_Dictionary {
+        keys: string[] = [];
+        values: any[] = [];
+
+        constructor(key: string = null,value: any = null){
+            if (key != null || value != null){
+                this.keys.insertAt(0, key)
+                this.values.insertAt(0, value)
+            }
+        }
+
+        append(key: string, value: number) :void{
+            this.keys.insertAt(0,key)
+            this.values.insertAt(0,value)
+        }
+
+        getValue(key :string) :any{
+            let i = 0
+            for (let x of this.keys) {
+                if (x == key) {
+                    return this.values[i]
+                }
+                i++
+            }
+            return null
+        }
+
+        removeElement(key :string) :void{
+            let i = 0
+            for (let x of this.keys) {
+                if (x == key) {
+                    this.keys.removeAt(i)
+                    this.values.removeAt(i)
+                    return
+                }
+                i++
+            }
+        }
+
+        toJSON(){
+            if(this.keys.length < 0 || this.values.length < 0){
+                return JSON.stringify({ data: null, type : "Moar_Dictionary" })
+            }
+
+            const firstKey: string = this.keys[0]
+            const firstValue = this.values[0]
+            let foo: {[key :string]:any} = {}
+
+            for (let i = 0; i < this.keys.length; i++) {
+                const xKey: string = this.keys[i]
+                const xValue = this.values[i]
+                foo[xKey] = xValue
+            }
+
+            return JSON.stringify({data : foo, type : "Moar_Dictionary"})
+        }
+
+        fromJSON(json:string){
+            let data:Json_Dicionary = JSON.parse(json)
+            if(data.type != "Moar_Dictionary") {throw "Cannot convert non dictionary"}
+            this.keys = []
+            this.values = []
+            if(data.data == null){
+                return
+            }
+            let keys = Object.keys(data.data)
+            for(let i = 0; i < keys.length; i++){
+                this.append(keys[i], data.data[keys[i]])
+            }
+        }
     }
     
     /**
@@ -91,12 +181,11 @@ namespace MoarTypes {
     //% block
     //% group="Dictionary"
     //% weight=100
-    export function CreateDictionary(initialKey : string, initialValue : any): Moar_Dictionary{
-        const _keys : string[] = [initialKey]
-        const _values : any[] = [initialValue]
-
-        let obj = {keys: _keys, values: _values}
-        return obj
+    export function CreateDictionary(initialKey : string = null, initialValue : any = null): Moar_Dictionary{
+        if(initialKey == null || initialValue == null){
+            return new Moar_Dictionary()
+        }
+        return new Moar_Dictionary(initialKey, initialValue)
     }
 
     /**
@@ -117,14 +206,7 @@ namespace MoarTypes {
     //% group="Dictionary"
     //% weight=98
     export function GetValue(dictionary : Moar_Dictionary, key : string) : any{
-        let i = 0
-        for (let x of dictionary.keys) {
-            if(x == key){
-                return dictionary.values[i]
-            }
-            i++
-        }
-        return null
+        return dictionary.getValue(key)
     }
     /**
      * Removes an element from a dictionary
@@ -133,40 +215,9 @@ namespace MoarTypes {
     //% group="Dictionary"
     //% weight=97
     export function RemoveElement(dictionary : Moar_Dictionary, key : string) : void{
-        let i = 0
-        for (let x of dictionary.keys) {
-            if (x == key) {
-                dictionary.keys.removeAt(i)
-                dictionary.values.removeAt(i)
-                return
-            }
-            i++
-        }
+        dictionary.removeElement(key)
     }
-    /**
-     * !Depracated! Converts a dictionary to a dictionary used by most other text based coding launguages and then converts it to json
-    */
-    //% block
-    //% group="Dictionary" 
-    //% advanced=true
-    export function ConvertDictionary(dictionary : Moar_Dictionary) : string{
-        if(dictionary.keys[0] == null || dictionary.values[0]){
-            throw "ERROR Dictionary cannot be null"
-        }
-        const firstKey : string = dictionary.keys[0]
-        const firstValue = dictionary.values[0]
-        let foo: any = {key : firstValue}
 
-        for(let i = 0; i >= dictionary.keys.length; i++){
-            const xKey : string = dictionary.keys[i]
-            const xValue = dictionary.values[i]
-            foo[xKey] = xValue
-        }
-
-        serial.writeLine("[MoarTypes] - WARNING Convert Dictionary is Depracated and Will NOT be updated in the future")
-
-        return JSON.stringify(foo)
-    }
 
     /**
      * Returns true if it is the specified type
@@ -222,7 +273,10 @@ namespace MoarTypes {
     //% weight=100
     export function JsonStringify(value : any) : string{
         if(isVector2(value) == true){
-            return(JSON.stringify(value.toJSON()))
+            return(value.toJSON())
+        }
+        if(isDictionary(value) == true){
+            return(value.toJSON())
         }
         return JSON.stringify(value)
     }
@@ -252,7 +306,19 @@ namespace MoarTypes {
         else if (IsMarked(value, Markers.Packet)) {
             throw "[MoarTypes] ERROR - DATA IS MARKED"
         }
-        return JSON.parse(value)
+        let json = JSON.parse(value)
+
+        if((json as Json_vector).type == "Vector2"){
+            return new Moar_Vector2(0,0).fromJson(value)
+        }
+
+        if((json as Json_Dicionary).type == "Moar_Dictionary"){
+            let obj = new Moar_Dictionary()
+            obj.fromJSON(value)
+            return obj
+        }
+
+        return json
     }
 
     /**
@@ -436,5 +502,4 @@ namespace MoarTypes {
     export function Null() : any{
         return null
     }
-
 }

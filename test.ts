@@ -35,7 +35,7 @@ if (runTests) {
 
     //Dictionary
 
-    assert("Check if create dictionary returns a object","object", typeof MoarTypes.CreateDictionary("Test", "foo"))
+    assert("Check if create dictionary returns a object","object", typeof MoarTypes.CreateDictionary())
     assert("Check is create dictionary has keys","test", MoarTypes.CreateDictionary("test","foo").keys[0])
     assert("Check is dictionary has values", "foo", MoarTypes.CreateDictionary("test","foo").values[0])
     let testDict = MoarTypes.CreateDictionary("test", "foo")
@@ -66,14 +66,14 @@ if (runTests) {
     const testJson = MoarTypes.JsonStringify(MoarTypes.NewVector2(5,6))
     const testJson2 = MoarTypes.JsonStringify(MoarTypes.CreateDictionary("test", "foo"))
     assert("JsonStringify /Vector/", '{"x":5,"y":6,"type":"Moar_Vector2"}', testJson)
-    assert("JsonStringify /Dictionary/", '{"keys":["test"],"values":["foo"]}', testJson2)
+    assert("JsonStringify /Dictionary/", '{"data":{"test":"foo"},"type":"Moar_Dictionary"}', testJson2)
 
-    let testjsonparse = MoarTypes.JsonParse(testJson2)
+    const testParse = MoarTypes.JsonParse(testJson2)
 
-    assert("JsonParse /Vector/ /Type/", "object", typeof MoarTypes.JsonParse(testJson))
     assert("JsonParse /Vector/ /X/", 5, MoarTypes.JsonParse(testJson).x)
     assert("JsonParse /Vector/ /Y/", 6, MoarTypes.JsonParse(testJson).y)
-    assert("JsonParse /Dictionary/ /Type/", "object", typeof MoarTypes.JsonParse(testJson2))
+    assert("JsonParse /Dictionary/ /Keys/", "test", (testParse as MoarTypes.Moar_Dictionary).keys[0])
+
 
     //Marking
 
