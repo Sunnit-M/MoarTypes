@@ -35,18 +35,18 @@ if (runTests) {
 
     //Dictionary
 
-    assert("Check if create dictionary returns a object","object", typeof MoarTypes.CreateDictionary())
-    assert("Check is create dictionary has keys","test", MoarTypes.CreateDictionary("test","foo").keys[0])
-    assert("Check is dictionary has values", "foo", MoarTypes.CreateDictionary("test","foo").values[0])
-    let testDict = MoarTypes.CreateDictionary("test", "foo")
+    assert("Check if create dictionary returns a object","object", typeof MoarTypes.NewDictionary())
+    assert("Check is create dictionary has keys","test", MoarTypes.NewDictionary("test","foo").keys[0])
+    assert("Check is dictionary has values", "foo", MoarTypes.NewDictionary("test","foo").getValue("test"))
+    let testDict = MoarTypes.NewDictionary("test", "foo")
     MoarTypes.RemoveElement(testDict, "test")
     assert("GetValue /key/", null, testDict.keys[0])
-    assert("GetValue /value/", null, testDict.values[0])
-    assert("GetValue", "foo", MoarTypes.GetValue(MoarTypes.CreateDictionary("test","foo"), "test"))
-    let testAppendDict = MoarTypes.CreateDictionary("test", "foo")
+    assert("GetValue /value/", null, testDict.getValue(testDict.keys[0]))
+    assert("GetValue", "foo", MoarTypes.GetValue(MoarTypes.NewDictionary("test","foo"), "test"))
+    let testAppendDict = MoarTypes.NewDictionary("test", "foo")
     MoarTypes.AppendDictionary(testAppendDict, "test2", "value2")
     assert("AppendDictionary /key/", "test2", testAppendDict.keys[0])
-    assert("AppendDictionary /key/", "value2", testAppendDict.values[0])
+    assert("AppendDictionary /key/", "value2", testAppendDict.getValue(testAppendDict.keys[0]))
 
     //Vector2
     let testVector = MoarTypes.NewVector2(5,6)
@@ -55,8 +55,8 @@ if (runTests) {
     assert("NewVector /Y/", 6, testVector.y)
     
     //Logic
-    assert("IsType /Dictionary/ /Backend/", true, MoarTypes.isDictionary(MoarTypes.CreateDictionary("Test", "foo")))
-    assert("IsType /Dictionary/ /Block/", true, MoarTypes.IsType(MoarTypes.TYPES._Moar_Dictionary, MoarTypes.CreateDictionary("test", "foo")))
+    assert("IsType /Dictionary/ /Backend/", true, MoarTypes.isDictionary(MoarTypes.NewDictionary("Test", "foo")))
+    assert("IsType /Dictionary/ /Block/", true, MoarTypes.IsType(MoarTypes.TYPES._Moar_Dictionary, MoarTypes.NewDictionary("test", "foo")))
     assert("isType /Vector2/", true, MoarTypes.IsType(MoarTypes.TYPES._Moar_Vector2, testVector))
     assert("isType /Vector/ /Backend/", true, MoarTypes.isVector2(MoarTypes.NewVector2(5,6)))
     assert("isType /Number/", true, MoarTypes.IsType(MoarTypes.TYPES._number, 5))
@@ -64,7 +64,7 @@ if (runTests) {
 
     //Json
     const testJson = MoarTypes.JsonStringify(MoarTypes.NewVector2(5,6))
-    const testJson2 = MoarTypes.JsonStringify(MoarTypes.CreateDictionary("test", "foo"))
+    const testJson2 = MoarTypes.JsonStringify(MoarTypes.NewDictionary("test", "foo"))
     assert("JsonStringify /Vector/", '{"x":5,"y":6,"type":"Moar_Vector2"}', testJson)
     assert("JsonStringify /Dictionary/", '{"data":{"test":"foo"},"type":"Moar_Dictionary"}', testJson2)
 
